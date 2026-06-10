@@ -1,0 +1,23 @@
+HOW TO USE ALTERNATES & LIGATURES :
+
+1. Adobe Illustrator & InDesign
+
+Enable Ligatures: Go to Window → Type → Character. In the Character panel, click the menu (≡) and ensure "Ligatures" is checked.
+Use Alternates: Highlight a character, right-click, and choose Alternates for Selection. Alternatively, open Glyphs Panel via Window → Type → Glyphs to manually select alternates.
+
+2. Adobe Photoshop
+Enable Ligatures: In the Character panel (Window → Character), click the menu (≡) and check "Ligatures."
+Use Alternates: Select a character, then right-click and choose Alternate Glyphs. Use the Glyphs panel (Window → Glyphs) for a full list.
+
+3. Microsoft Word
+Enable Ligatures and Alternates: Highlight your text, open the Font Dialog Box (Ctrl+D or Cmd+D), go to the Advanced tab, and under OpenType Features, enable Ligatures or Stylistic Sets.
+
+4. Affinity Designer/Publisher
+Enable Ligatures: Open the Character Panel, then go to Typography and toggle "Standard Ligatures" or "Discretionary Ligatures."
+Use Alternates: Highlight the character, open the Typography panel, and select from the Stylistic Alternates options.
+
+5. Procreate (iPad)
+Procreate doesn’t have native ligature or alternate support but works well if you import SVGs created in apps like Illustrator or Photoshop with these features enabled.
+
+6. Canva
+Canva currently lacks full OpenType support for alternates and ligatures. You’ll need to manually replace characters using pre-generated alternates in your font file.

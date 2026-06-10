@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Grancesela Live Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: Arial, sans-serif; }
+    .input { width: 100%; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.6rem; font-size: 0.9rem; }
+    .btn-dark { background: #020617; color: white; border-radius: 0.5rem; padding: 0.6rem 1rem; font-weight: 600; }
+    .btn-light { background: white; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.55rem 0.9rem; font-weight: 500; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+  <div id="loginScreen" class="min-h-screen flex items-center justify-center p-6">
+    <form onsubmit="login(event)" class="bg-white border rounded-2xl shadow p-8 w-full max-w-md">
+      <h1 class="text-3xl font-semibold mb-1">La Grancesela</h1>
+      <p class="text-slate-500 mb-6">Admin Management Portal</p>
+      <label class="text-sm font-medium">Email</label>
+      <input id="email" type="email" required value="admin@lagrancesela.com" class="input mb-4" />
+      <label class="text-sm font-medium">Password</label>
+      <input id="password" type="password" required value="ChangeThisPassword123!" class="input mb-6" />
+      <button class="w-full btn-dark">Log In</button>
+      <p id="loginError" class="text-red-600 text-sm mt-4"></p>
+    </form>
+  </div>
+
+  <div id="adminScreen" class="hidden min-h-screen">
+    <aside class="fixed left-0 top-0 h-full w-64 bg-slate-950 text-white p-6">
+      <h1 class="text-xl font-semibold">La Grancesela</h1>
+      <p class="text-xs uppercase text-slate-400 mb-8">Boutique Management</p>
+      <nav class="space-y-2">
+        <button onclick="showTab('dashboard')" class="block w-full text-left p-3 rounded hover:bg-white/10">Dashboard</button>
+        <button onclick="showTab('bookings')" class="block w-full text-left p-3 rounded hover:bg-white/10">Bookings</button>
+        <button onclick="showTab('rooms')" class="block w-full text-left p-3 rounded hover:bg-white/10">Rooms</button>
+        <button onclick="showTab('events')" class="block w-full text-left p-3 rounded hover:bg-white/10">Events</button>
+        <button onclick="showTab('calendar')" class="block w-full text-left p-3 rounded hover:bg-white/10">Calendar</button>
+        <button onclick="showTab('tickets')" class="block w-full text-left p-3 rounded hover:bg-white/10">Tickets</button>
+      </nav>
+      <button onclick="logout()" class="absolute bottom-6 left-6 right-6 bg-white text-slate-950 rounded-lg p-2">Log Out</button>
+    </aside>
+    <main class="ml-64 p-8">
+      <h2 id="pageTitle" class="text-3xl font-semibold mb-6">Dashboard</h2>
+      <section id="dashboard" class="tab"></section>
+      <section id="bookings" class="tab hidden"></section>
+      <section id="rooms" class="tab hidden"></section>
+      <section id="events" class="tab hidden"></section>
+      <section id="calendar" class="tab hidden"></section>
+      <section id="tickets" class="tab hidden"></section>
+    </main>
+  </div>
+
+  <script>
+    const API = "http://localhost:3000/api";
+    let currentCalendarDate = new Date();
+    let allRooms = [];
+    let allBookings = [];
+    let allEvents = [];
+    let allTickets = [];
+
+    function token() { return localStorage.getItem("adminToken"); }
+    function fmtDate(value) { return value ? new Date(value).toISOString().split("T")[0] : ""; }
+    function displayDate(value) { return value ? new Date(value).toLocaleDateString() : ""; }
+    function badge(value) { return `<span class="px-2 py-1 rounded-full text-xs bg-slate-200">${value || ""}</span>`; }
+    function escapeHtml(value) {
+      if (value === null || value === undefined) return "";
+      return String(value).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
+    }
+    function roomOptions(selectedId) {
+      return `<option value="">Unassigned</option>${allRooms.map(room => `<option value="${room.room_id}" ${Number(selectedId) === Number(room.room_id) ? "selected" : ""}>${escapeHtml(room.room_name)}</option>`).join("")}`;
+    }
+    async function request(path, options = {}) {
+      const response = await fetch(API + path, { ...options, headers: { "Content-Type": "application/json", ...(token() ? { Authorization: "Bearer " + token() } : {}), ...(options.headers || {}) } });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.message || "Request failed");
+      return data;
+    }
+
+    async function login(event) {
+      event.preventDefault();
+      try {
+        const data = await request("/admin/login", { method: "POST", body: JSON.stringify({ email: email.value, password: password.value }) });
+        localStorage.setItem("adminToken", data.token);
+        boot();
+      } catch (error) { loginError.textContent = error.message; }
+    }
+    function logout() { localStorage.removeItem("adminToken"); location.reload(); }
+    async function boot() {
+      loginScreen.classList.add("hidden");
+      adminScreen.classList.remove("hidden");
+      await loadRooms(false);
+      await loadDashboard();
+      await loadBusinessProfile();
+      await loadBookings();
+      await loadEvents();
+      await loadTickets();
+      await loadCalendar();
+      await loadRooms(true);
+    }
+    function showTab(name) {
+      document.querySelectorAll(".tab").forEach(tab => tab.classList.add("hidden"));
+      document.getElementById(name).classList.remove("hidden");
+      pageTitle.textContent = name[0].toUpperCase() + name.slice(1);
+    }
+
+    async function loadDashboard() {
+      const s = await request("/dashboard/summary");
+      dashboard.innerHTML = `<div class="grid grid-cols-4 gap-4">
+        <div class="bg-white p-5 rounded-xl border"><p>Total Bookings</p><h3 class="text-3xl font-bold">${s.total_bookings || 0}</h3></div>
+        <div class="bg-white p-5 rounded-xl border"><p>Pending Bookings</p><h3 class="text-3xl font-bold">${s.pending_bookings || 0}</h3></div>
+        <div class="bg-white p-5 rounded-xl border"><p>Available Rooms</p><h3 class="text-3xl font-bold">${s.available_rooms || 0}</h3></div>
+        <div class="bg-white p-5 rounded-xl border"><p>Open Tickets</p><h3 class="text-3xl font-bold">${s.open_tickets || 0}</h3></div>
+      </div>`;
+    }
+    async function loadBusinessProfile() {
+      const p = await request("/business-profile");
+      dashboard.innerHTML += `<div class="bg-white p-5 rounded-xl border mt-6"><div class="flex justify-between gap-4"><div><h3 class="text-2xl font-semibold mb-3">${escapeHtml(p.business_name || "La Grancesela")}</h3><p><b>Address:</b> ${escapeHtml(p.address || "")}</p><p><b>Phone:</b> ${escapeHtml(p.phone || "")}</p><p><b>Email:</b> ${escapeHtml(p.email || "")}</p></div><button onclick="showBusinessEditForm(${p.profile_id || 1})" class="btn-light">Edit Profile</button></div><div id="businessEditArea" class="mt-4"></div></div>`;
+    }
+    async function showBusinessEditForm(profileId) {
+      const p = await request("/business-profile");
+      businessEditArea.innerHTML = `<form onsubmit="updateBusinessProfile(event, ${profileId})" class="grid grid-cols-2 gap-3 border-t pt-4"><input id="businessNameEdit" class="input" value="${escapeHtml(p.business_name || "")}" placeholder="Business name" /><input id="businessEmailEdit" class="input" value="${escapeHtml(p.email || "")}" placeholder="Email" /><input id="businessPhoneEdit" class="input" value="${escapeHtml(p.phone || "")}" placeholder="Phone" /><input id="businessAddressEdit" class="input" value="${escapeHtml(p.address || "")}" placeholder="Address" /><button class="btn-dark col-span-2">Save Business Profile</button></form>`;
+    }
+    async function updateBusinessProfile(event, profileId) {
+      event.preventDefault();
+      await request(`/business-profile/${profileId}`, { method: "PATCH", body: JSON.stringify({ business_name: businessNameEdit.value, address: businessAddressEdit.value, phone: businessPhoneEdit.value, email: businessEmailEdit.value }) });
+      await loadDashboard(); await loadBusinessProfile(); alert("Business profile updated.");
+    }
+
+    async function loadRooms(renderTab = true) {
+      allRooms = await request("/rooms");
+      if (!renderTab) return;
+      rooms.innerHTML = `<div class="bg-white border rounded-xl p-5 mb-6"><h3 class="text-xl font-semibold mb-4">Add Room</h3><form onsubmit="createRoom(event)" class="grid grid-cols-3 gap-3"><input id="newRoomName" class="input" placeholder="Room name" /><input id="newRoomType" class="input" placeholder="Room type" /><input id="newMaxGuests" class="input" type="number" min="1" placeholder="Max guests" /><input id="newNightlyRate" class="input" type="number" step="0.01" placeholder="Nightly rate" /><select id="newRoomStatus" class="input"><option>Available</option><option>Booked</option><option>Pending</option><option>Cancelled</option></select><input id="newRoomNotes" class="input" placeholder="Notes" /><button class="btn-dark col-span-3">Create Room</button></form></div><div class="grid grid-cols-2 gap-4">${allRooms.map(room => `<div class="bg-white border rounded-xl p-5"><h3 class="text-xl font-semibold mb-3">${escapeHtml(room.room_name)}</h3><form onsubmit="updateRoom(event, ${room.room_id})" class="space-y-3"><input id="roomName${room.room_id}" class="input" value="${escapeHtml(room.room_name)}" /><input id="roomType${room.room_id}" class="input" value="${escapeHtml(room.room_type || "")}" /><input id="roomGuests${room.room_id}" class="input" type="number" min="1" value="${room.max_guests}" /><input id="roomRate${room.room_id}" class="input" type="number" step="0.01" value="${room.nightly_rate || ""}" /><select id="roomStatus${room.room_id}" class="input">${["Available", "Booked", "Pending", "Cancelled"].map(status => `<option value="${status}" ${status === room.room_status ? "selected" : ""}>${status}</option>`).join("")}</select><textarea id="roomNotes${room.room_id}" class="input" rows="3">${escapeHtml(room.notes || "")}</textarea><div class="flex gap-2"><button class="btn-dark">Save</button><button type="button" onclick="deleteRoom(${room.room_id})" class="btn-light">Delete</button></div></form></div>`).join("")}</div>`;
+    }
+    async function createRoom(event) { event.preventDefault(); await request("/rooms", { method: "POST", body: JSON.stringify({ room_name: newRoomName.value, room_type: newRoomType.value, max_guests: newMaxGuests.value, nightly_rate: newNightlyRate.value, room_status: newRoomStatus.value, notes: newRoomNotes.value }) }); await loadRooms(true); await loadDashboard(); alert("Room created."); }
+    async function updateRoom(event, id) { event.preventDefault(); await request(`/rooms/${id}`, { method: "PATCH", body: JSON.stringify({ room_name: document.getElementById(`roomName${id}`).value, room_type: document.getElementById(`roomType${id}`).value, max_guests: document.getElementById(`roomGuests${id}`).value, nightly_rate: document.getElementById(`roomRate${id}`).value, room_status: document.getElementById(`roomStatus${id}`).value, notes: document.getElementById(`roomNotes${id}`).value }) }); await loadRooms(true); await loadDashboard(); alert("Room updated."); }
+    async function deleteRoom(id) { if (!confirm("Delete this room?")) return; await request(`/rooms/${id}`, { method: "DELETE" }); await loadRooms(true); await loadDashboard(); alert("Room deleted."); }
+
+    async function loadBookings() {
+      allBookings = await request("/bookings");
+      bookings.innerHTML = `<div class="bg-white border rounded-xl overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-100"><tr><th class="p-3 text-sm">ID</th><th class="p-3 text-sm">Guest</th><th class="p-3 text-sm">Dates</th><th class="p-3 text-sm">Room</th><th class="p-3 text-sm">Status</th><th class="p-3 text-sm">Action</th></tr></thead><tbody>${allBookings.map(b => `<tr class="border-t"><td class="p-3 text-sm">#BR-${b.booking_id}</td><td class="p-3 text-sm">${escapeHtml(b.guest_name)}<br><span class="text-xs text-slate-500">${escapeHtml(b.guest_email)}</span></td><td class="p-3 text-sm">${displayDate(b.arrival_date)} - ${displayDate(b.departure_date)}</td><td class="p-3 text-sm">${escapeHtml(b.room_name || "Unassigned")}</td><td class="p-3 text-sm">${badge(b.booking_status)}</td><td class="p-3 text-sm"><button onclick="showBookingEditForm(${b.booking_id})" class="btn-light">Edit</button></td></tr>`).join("")}</tbody></table></div><div id="bookingEditArea" class="mt-6"></div>`;
+    }
+    function showBookingEditForm(id) {
+      const b = allBookings.find(item => Number(item.booking_id) === Number(id));
+      bookingEditArea.innerHTML = `<div class="bg-white border rounded-xl p-5"><h3 class="text-xl font-semibold mb-4">Edit Booking #BR-${b.booking_id}</h3><form onsubmit="updateBooking(event, ${b.booking_id})" class="grid grid-cols-2 gap-3"><input id="bookingGuestName" class="input" value="${escapeHtml(b.guest_name)}" placeholder="Guest name" /><input id="bookingGuestEmail" class="input" value="${escapeHtml(b.guest_email)}" placeholder="Guest email" /><input id="bookingGuestPhone" class="input" value="${escapeHtml(b.guest_phone || "")}" placeholder="Guest phone" /><input id="bookingGuestCount" class="input" type="number" min="1" value="${b.number_of_guests}" /><input id="bookingArrivalDate" class="input" type="date" value="${fmtDate(b.arrival_date)}" /><input id="bookingDepartureDate" class="input" type="date" value="${fmtDate(b.departure_date)}" /><select id="bookingRoomId" class="input">${roomOptions(b.room_id)}</select><select id="bookingStatus" class="input">${["Available", "Booked", "Pending", "Cancelled"].map(status => `<option value="${status}" ${status === b.booking_status ? "selected" : ""}>${status}</option>`).join("")}</select><textarea id="bookingNotes" class="input col-span-2" rows="4" placeholder="Special notes">${escapeHtml(b.special_notes || "")}</textarea><button class="btn-dark">Save Booking</button><button type="button" onclick="loadBookingNotes(${b.booking_id})" class="btn-light">View Notes</button></form><div class="mt-4 border-t pt-4"><h4 class="font-semibold mb-2">Add Booking Note</h4><textarea id="bookingNoteText" class="input mb-2" rows="3"></textarea><button onclick="addBookingNote(${b.booking_id})" class="btn-dark">Add Note</button></div><div id="bookingNotesArea" class="mt-4"></div></div>`;
+    }
+    async function updateBooking(event, id) { event.preventDefault(); await request(`/bookings/${id}`, { method: "PATCH", body: JSON.stringify({ room_id: bookingRoomId.value || null, guest_name: bookingGuestName.value, guest_email: bookingGuestEmail.value, guest_phone: bookingGuestPhone.value, arrival_date: bookingArrivalDate.value, departure_date: bookingDepartureDate.value, number_of_guests: bookingGuestCount.value, booking_status: bookingStatus.value, special_notes: bookingNotes.value }) }); alert("Booking updated."); await loadBookings(); await loadDashboard(); await loadBusinessProfile(); }
+
+    async function loadEvents() {
+      allEvents = await request("/event-inquiries");
+      events.innerHTML = `<div class="bg-white border rounded-xl overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-100"><tr><th class="p-3 text-sm">ID</th><th class="p-3 text-sm">Contact</th><th class="p-3 text-sm">Type</th><th class="p-3 text-sm">Date</th><th class="p-3 text-sm">Status</th><th class="p-3 text-sm">Action</th></tr></thead><tbody>${allEvents.map(e => `<tr class="border-t"><td class="p-3 text-sm">#REQ-${e.event_id}</td><td class="p-3 text-sm">${escapeHtml(e.contact_name)}<br><span class="text-xs text-slate-500">${escapeHtml(e.contact_email)}</span></td><td class="p-3 text-sm">${escapeHtml(e.event_type)}</td><td class="p-3 text-sm">${displayDate(e.requested_event_date)}</td><td class="p-3 text-sm">${badge(e.inquiry_status)}</td><td class="p-3 text-sm"><button onclick="showEventEditForm(${e.event_id})" class="btn-light">Edit</button></td></tr>`).join("")}</tbody></table></div><div id="eventEditArea" class="mt-6"></div>`;
+    }
+    function showEventEditForm(id) {
+      const e = allEvents.find(item => Number(item.event_id) === Number(id));
+      eventEditArea.innerHTML = `<div class="bg-white border rounded-xl p-5"><h3 class="text-xl font-semibold mb-4">Edit Event Inquiry #REQ-${e.event_id}</h3><form onsubmit="updateEvent(event, ${e.event_id})" class="grid grid-cols-2 gap-3"><input id="eventType" class="input" value="${escapeHtml(e.event_type)}" /><input id="eventDate" class="input" type="date" value="${fmtDate(e.requested_event_date)}" /><input id="eventVenue" class="input" value="${escapeHtml(e.venue_preference || "")}" /><input id="eventGuestCount" class="input" type="number" min="1" value="${e.estimated_guest_count}" /><input id="eventContactName" class="input" value="${escapeHtml(e.contact_name)}" /><input id="eventContactEmail" class="input" value="${escapeHtml(e.contact_email)}" /><input id="eventContactPhone" class="input" value="${escapeHtml(e.contact_phone || "")}" /><select id="eventStatus" class="input">${["Available", "Booked", "Pending", "Cancelled"].map(status => `<option value="${status}" ${status === e.inquiry_status ? "selected" : ""}>${status}</option>`).join("")}</select><textarea id="eventMessage" class="input col-span-2" rows="4">${escapeHtml(e.inquiry_message || "")}</textarea><button class="btn-dark">Save Event</button><button type="button" onclick="loadEventNotes(${e.event_id})" class="btn-light">View Notes</button></form><div class="mt-4 border-t pt-4"><h4 class="font-semibold mb-2">Add Event Note</h4><textarea id="eventNoteText" class="input mb-2" rows="3"></textarea><button onclick="addEventNote(${e.event_id})" class="btn-dark">Add Note</button></div><div id="eventNotesArea" class="mt-4"></div></div>`;
+    }
+    async function updateEvent(event, id) { event.preventDefault(); await request(`/event-inquiries/${id}`, { method: "PATCH", body: JSON.stringify({ event_type: eventType.value, requested_event_date: eventDate.value, venue_preference: eventVenue.value, estimated_guest_count: eventGuestCount.value, contact_name: eventContactName.value, contact_email: eventContactEmail.value, contact_phone: eventContactPhone.value, inquiry_message: eventMessage.value, inquiry_status: eventStatus.value }) }); alert("Event inquiry updated."); await loadEvents(); await loadDashboard(); await loadBusinessProfile(); }
+
+    async function loadTickets() {
+      allTickets = await request("/tickets");
+      tickets.innerHTML = `<div class="bg-white border rounded-xl overflow-hidden"><table class="w-full text-left"><thead class="bg-slate-100"><tr><th class="p-3 text-sm">ID</th><th class="p-3 text-sm">Requester</th><th class="p-3 text-sm">Title</th><th class="p-3 text-sm">Priority</th><th class="p-3 text-sm">Status</th><th class="p-3 text-sm">Action</th></tr></thead><tbody>${allTickets.map(t => `<tr class="border-t"><td class="p-3 text-sm">#TKT-${t.ticket_id}</td><td class="p-3 text-sm">${escapeHtml(t.requester_name || "N/A")}<br><span class="text-xs text-slate-500">${escapeHtml(t.requester_email || "")}</span></td><td class="p-3 text-sm">${escapeHtml(t.ticket_title || "No title")}</td><td class="p-3 text-sm">${t.ticket_priority}</td><td class="p-3 text-sm">${badge(t.ticket_status)}</td><td class="p-3 text-sm"><button onclick="showTicketEditForm(${t.ticket_id})" class="btn-light">Edit</button></td></tr>`).join("")}</tbody></table></div><div id="ticketEditArea" class="mt-6"></div>`;
+    }
+    function showTicketEditForm(id) {
+      const t = allTickets.find(item => Number(item.ticket_id) === Number(id));
+      ticketEditArea.innerHTML = `<div class="bg-white border rounded-xl p-5"><h3 class="text-xl font-semibold mb-4">Edit Ticket #TKT-${t.ticket_id}</h3><form onsubmit="updateTicket(event, ${t.ticket_id})" class="grid grid-cols-2 gap-3"><input id="ticketRequesterName" class="input" value="${escapeHtml(t.requester_name || "")}" /><input id="ticketRequesterEmail" class="input" value="${escapeHtml(t.requester_email || "")}" /><input id="ticketRequesterPhone" class="input" value="${escapeHtml(t.requester_phone || "")}" /><input id="ticketTitle" class="input" value="${escapeHtml(t.ticket_title || "")}" /><select id="ticketPriority" class="input">${["Low", "Medium", "High", "Urgent"].map(p => `<option value="${p}" ${p === t.ticket_priority ? "selected" : ""}>${p}</option>`).join("")}</select><select id="ticketStatus" class="input">${["Open", "In Progress", "Resolved", "Closed"].map(s => `<option value="${s}" ${s === t.ticket_status ? "selected" : ""}>${s}</option>`).join("")}</select><select id="ticketBookingId" class="input"><option value="">No related booking</option>${allBookings.map(b => `<option value="${b.booking_id}" ${Number(t.related_booking_id) === Number(b.booking_id) ? "selected" : ""}>#BR-${b.booking_id} ${escapeHtml(b.guest_name)}</option>`).join("")}</select><select id="ticketEventId" class="input"><option value="">No related event</option>${allEvents.map(e => `<option value="${e.event_id}" ${Number(t.related_event_id) === Number(e.event_id) ? "selected" : ""}>#REQ-${e.event_id} ${escapeHtml(e.event_type)}</option>`).join("")}</select><textarea id="ticketDescription" class="input col-span-2" rows="4">${escapeHtml(t.ticket_description || "")}</textarea><button class="btn-dark">Save Ticket</button><button type="button" onclick="loadTicketNotes(${t.ticket_id})" class="btn-light">View Notes</button></form><div class="mt-4 border-t pt-4"><h4 class="font-semibold mb-2">Add Ticket Note</h4><textarea id="ticketNoteText" class="input mb-2" rows="3"></textarea><button onclick="addTicketNote(${t.ticket_id})" class="btn-dark">Add Note</button></div><div id="ticketNotesArea" class="mt-4"></div></div>`;
+    }
+    async function updateTicket(event, id) { event.preventDefault(); await request(`/tickets/${id}`, { method: "PATCH", body: JSON.stringify({ requester_name: ticketRequesterName.value, requester_email: ticketRequesterEmail.value, requester_phone: ticketRequesterPhone.value, related_booking_id: ticketBookingId.value || null, related_event_id: ticketEventId.value || null, ticket_title: ticketTitle.value, ticket_description: ticketDescription.value, ticket_priority: ticketPriority.value, ticket_status: ticketStatus.value }) }); alert("Ticket updated."); await loadTickets(); await loadDashboard(); await loadBusinessProfile(); }
+
+    async function loadCalendar() {
+      const rows = await request("/calendar-availability");
+      const year = currentCalendarDate.getFullYear();
+      const month = currentCalendarDate.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const startDay = firstDay.getDay();
+      const totalDays = lastDay.getDate();
+      const monthName = currentCalendarDate.toLocaleString("default", { month: "long", year: "numeric" });
+      const availabilityByDate = {};
+      rows.forEach(item => { const key = fmtDate(item.calendar_date); if (!availabilityByDate[key]) availabilityByDate[key] = []; availabilityByDate[key].push(item); });
+      let calendarCells = "";
+      for (let i = 0; i < startDay; i++) calendarCells += `<div class="min-h-28 bg-slate-100 border rounded-lg p-2"></div>`;
+      for (let day = 1; day <= totalDays; day++) {
+        const dateKey = new Date(year, month, day).toISOString().split("T")[0];
+        const dayItems = availabilityByDate[dateKey] || [];
+        let statusSummary = "No Data", statusClass = "bg-slate-100 text-slate-600";
+        if (dayItems.length > 0) {
+          const statuses = dayItems.map(item => item.availability_status);
+          if (statuses.includes("Booked")) { statusSummary = "Booked"; statusClass = "bg-red-100 text-red-700"; }
+          else if (statuses.includes("Pending")) { statusSummary = "Pending"; statusClass = "bg-yellow-100 text-yellow-700"; }
+          else if (statuses.every(status => status === "Available")) { statusSummary = "Available"; statusClass = "bg-green-100 text-green-700"; }
+          else { statusSummary = "Mixed"; statusClass = "bg-blue-100 text-blue-700"; }
+        }
+        calendarCells += `<button onclick="showCalendarDay('${dateKey}')" class="min-h-28 bg-white border rounded-lg p-3 text-left hover:bg-slate-50 transition"><div class="flex items-center justify-between mb-2"><span class="font-semibold">${day}</span><span class="text-xs px-2 py-1 rounded-full ${statusClass}">${statusSummary}</span></div><div class="text-xs text-slate-500">${dayItems.length} availability record(s)</div></button>`;
+      }
+      calendar.innerHTML = `<div class="space-y-6"><div class="flex items-center justify-between"><div><h3 class="text-2xl font-semibold">${monthName}</h3><p class="text-slate-500 text-sm">Click a date to view or update availability.</p></div><div class="flex gap-2"><button onclick="changeCalendarMonth(-1)" class="btn-light">Previous</button><button onclick="goToCurrentMonth()" class="btn-light">Today</button><button onclick="changeCalendarMonth(1)" class="btn-light">Next</button></div></div><div class="bg-white border rounded-xl p-5"><h3 class="text-xl font-semibold mb-4">Create Single-Day Availability</h3><form onsubmit="createAvailability(event)" class="grid grid-cols-4 gap-3 mb-6"><select id="availabilityRoomId" class="input">${roomOptions("")}</select><input id="availabilityDate" class="input" type="date" /><select id="availabilityStatus" class="input"><option>Available</option><option>Pending</option><option>Booked</option><option>Cancelled</option></select><input id="availabilityNotes" class="input" placeholder="Notes" /><button class="btn-dark col-span-4">Create Single-Day Availability</button></form><div class="border-t pt-5"><h3 class="text-xl font-semibold mb-4">Create Date Range Availability</h3><form onsubmit="createAvailabilityRange(event)" class="grid grid-cols-5 gap-3"><select id="rangeRoomId" class="input">${roomOptions("")}</select><input id="rangeStartDate" class="input" type="date" /><input id="rangeEndDate" class="input" type="date" /><select id="rangeStatus" class="input"><option>Available</option><option>Pending</option><option>Booked</option><option>Cancelled</option></select><input id="rangeNotes" class="input" placeholder="Notes for date range" /><button class="btn-dark col-span-5">Apply Availability to Date Range</button></form></div></div><div class="grid grid-cols-7 gap-2 text-center text-sm font-medium text-slate-500"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div><div class="grid grid-cols-7 gap-2">${calendarCells}</div><div id="calendarDayDetails" class="bg-white border rounded-xl p-5"><h3 class="text-xl font-semibold mb-2">Date Details</h3><p class="text-slate-500 text-sm">Select a date from the calendar to view details.</p></div></div>`;
+      window.calendarRows = rows;
+    }
+    function changeCalendarMonth(direction) { currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction); loadCalendar(); }
+    function goToCurrentMonth() { currentCalendarDate = new Date(); loadCalendar(); }
+    function showCalendarDay(dateKey) {
+      const selectedItems = (window.calendarRows || []).filter(item => fmtDate(item.calendar_date) === dateKey);
+      const details = document.getElementById("calendarDayDetails");
+      if (!selectedItems.length) { details.innerHTML = `<h3 class="text-xl font-semibold mb-2">${dateKey}</h3><p class="text-slate-500 text-sm">No availability records found for this date.</p>`; return; }
+      details.innerHTML = `<h3 class="text-xl font-semibold mb-4">${dateKey}</h3><div class="space-y-3">${selectedItems.map(item => `<div class="border rounded-lg p-4"><div class="grid grid-cols-4 gap-3 items-center"><div><p class="font-medium">${escapeHtml(item.room_name || "Property")}</p><p class="text-sm text-slate-500">${escapeHtml(item.availability_notes || "No notes")}</p></div><select id="calRoom${item.availability_id}" class="input">${roomOptions(item.room_id)}</select><select id="calStatus${item.availability_id}" class="input">${["Available", "Pending", "Booked", "Cancelled"].map(status => `<option value="${status}" ${status === item.availability_status ? "selected" : ""}>${status}</option>`).join("")}</select><input id="calNotes${item.availability_id}" class="input" value="${escapeHtml(item.availability_notes || "")}" /><button onclick="updateAvailabilityFull(${item.availability_id}, '${dateKey}')" class="btn-dark">Save</button><button onclick="deleteAvailability(${item.availability_id})" class="btn-light">Delete</button></div></div>`).join("")}</div>`;
+    }
+    async function createAvailability(event) { event.preventDefault(); await request("/calendar-availability", { method: "POST", body: JSON.stringify({ room_id: availabilityRoomId.value || null, calendar_date: availabilityDate.value, availability_status: availabilityStatus.value, availability_notes: availabilityNotes.value }) }); await loadCalendar(); alert("Availability created."); }
+    async function createAvailabilityRange(event) { event.preventDefault(); if (!rangeStartDate.value || !rangeEndDate.value) { alert("Please select a start date and end date."); return; } if (new Date(rangeEndDate.value) < new Date(rangeStartDate.value)) { alert("End date must be the same as or after the start date."); return; } const result = await request("/calendar-availability/range", { method: "POST", body: JSON.stringify({ room_id: rangeRoomId.value || null, start_date: rangeStartDate.value, end_date: rangeEndDate.value, availability_status: rangeStatus.value, availability_notes: rangeNotes.value }) }); await loadCalendar(); alert(`Date range availability updated for ${result.total_days} day(s).`); }
+    async function updateAvailabilityFull(id, dateKey) { await request(`/calendar-availability/${id}`, { method: "PATCH", body: JSON.stringify({ room_id: document.getElementById(`calRoom${id}`).value || null, calendar_date: dateKey, availability_status: document.getElementById(`calStatus${id}`).value, availability_notes: document.getElementById(`calNotes${id}`).value }) }); await loadCalendar(); showCalendarDay(dateKey); alert("Availability updated."); }
+    async function deleteAvailability(id) { if (!confirm("Delete this availability record?")) return; await request(`/calendar-availability/${id}`, { method: "DELETE" }); await loadCalendar(); alert("Availability deleted."); }
+
+    async function addNote(payload) { await request("/admin-notes", { method: "POST", body: JSON.stringify(payload) }); alert("Note added."); }
+    async function addBookingNote(id) { await addNote({ booking_id: id, note_text: bookingNoteText.value }); bookingNoteText.value = ""; await loadBookingNotes(id); }
+    async function addEventNote(id) { await addNote({ event_id: id, note_text: eventNoteText.value }); eventNoteText.value = ""; await loadEventNotes(id); }
+    async function addTicketNote(id) { await addNote({ ticket_id: id, note_text: ticketNoteText.value }); ticketNoteText.value = ""; await loadTicketNotes(id); }
+    async function loadBookingNotes(id) { bookingNotesArea.innerHTML = renderNotes(await request(`/admin-notes/booking/${id}`)); }
+    async function loadEventNotes(id) { eventNotesArea.innerHTML = renderNotes(await request(`/admin-notes/event/${id}`)); }
+    async function loadTicketNotes(id) { ticketNotesArea.innerHTML = renderNotes(await request(`/admin-notes/ticket/${id}`)); }
+    function renderNotes(notes) { if (!notes.length) return `<p class="text-sm text-slate-500">No notes yet.</p>`; return `<div class="space-y-2">${notes.map(note => `<div class="bg-slate-50 border rounded-lg p-3"><p class="text-sm">${escapeHtml(note.note_text)}</p><p class="text-xs text-slate-500 mt-1">${escapeHtml(note.admin_name || "Admin")} - ${displayDate(note.created_at)}</p></div>`).join("")}</div>`; }
+
+    if (token()) boot();
+  </script>
+</body>
+</html>

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>La Grancesela - Calendar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#dec29a",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e4e2e4",
+                        "on-error": "#ffffff",
+                        "tertiary": "#000000",
+                        "on-primary": "#ffffff",
+                        "on-secondary-container": "#fffbff",
+                        "primary-container": "#131b2e",
+                        "outline-variant": "#c6c6cd",
+                        "on-tertiary-container": "#98805d",
+                        "on-primary-fixed": "#131b2e",
+                        "secondary": "#4b41e1",
+                        "surface-container-low": "#f6f3f5",
+                        "background": "#fcf8fa",
+                        "inverse-on-surface": "#f3f0f2",
+                        "surface": "#fcf8fa",
+                        "on-surface-variant": "#45464d",
+                        "secondary-container": "#645efb",
+                        "secondary-fixed": "#e2dfff",
+                        "surface-dim": "#dcd9db",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-container": "#271901",
+                        "surface-tint": "#565e74",
+                        "on-background": "#1b1b1d",
+                        "primary": "#000000",
+                        "inverse-surface": "#303032",
+                        "surface-bright": "#fcf8fa",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#574425",
+                        "on-tertiary-fixed": "#271901",
+                        "on-primary-fixed-variant": "#3f465c",
+                        "error": "#ba1a1a",
+                        "primary-fixed-dim": "#bec6e0",
+                        "primary-fixed": "#dae2fd",
+                        "secondary-fixed-dim": "#c3c0ff",
+                        "on-secondary-fixed": "#0f0069",
+                        "error-container": "#ffdad6",
+                        "on-secondary-fixed-variant": "#3323cc",
+                        "on-primary-container": "#7c839b",
+                        "surface-container": "#f0edef",
+                        "inverse-primary": "#bec6e0",
+                        "outline": "#76777d",
+                        "surface-container-highest": "#e4e2e4",
+                        "on-surface": "#1b1b1d",
+                        "tertiary-fixed": "#fcdeb5",
+                        "surface-container-high": "#eae7e9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "section-padding": "2rem",
+                        "sidebar-width": "260px",
+                        "gutter": "1.5rem",
+                        "container-max-width": "1440px",
+                        "card-gap": "1rem"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "600" }],
+                        "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg": ["30px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24; }
+        /* Tonal Layers - Level 1 (Cards/Surfaces) */
+        .surface-level-1 {
+            background-color: #ffffff;
+            border: 1px solid #E2E8F0;
+            box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.05);
+        }
+        /* Tonal Layers - Level 2 (Dropdowns/Modals) */
+        .surface-level-2 {
+            background-color: #ffffff;
+            box-shadow: 0px 10px 15px 0px rgba(0, 0, 0, 0.1);
+        }
+        /* Input Focus */
+        .input-focus:focus-within {
+            border-color: #4b41e1; /* secondary */
+            box-shadow: 0 0 0 3px rgba(75, 65, 225, 0.2);
+        }
+    </style>
+</head>
+<body class="flex bg-background text-on-background h-screen overflow-hidden">
+<!-- SideNavBar (Shared Component) -->
+<nav class="fixed left-0 top-0 h-full w-[260px] bg-primary dark:bg-surface-container-lowest border-r border-outline-variant dark:border-outline flex flex-col py-6 z-20">
+<div class="px-6 mb-8">
+<h1 class="font-headline-sm text-headline-sm text-on-primary dark:text-primary tracking-tight">La Grancesela</h1>
+<p class="font-label-sm text-label-sm text-on-primary/70 mt-1 uppercase">Boutique Management</p>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full bg-secondary text-on-secondary font-label-md text-label-md py-3 rounded-DEFAULT hover:bg-secondary-container transition-colors duration-200">
+                New Booking
+            </button>
+</div>
+<div class="flex-1 overflow-y-auto">
+<ul class="space-y-1">
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                        Dashboard
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+                        Bookings
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+                        Events
+                    </a>
+</li>
+<!-- Active Item -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 border-l-4 border-secondary bg-secondary-container/10 text-on-primary dark:text-primary font-bold transition-colors duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="event_note">event_note</span>
+                        Calendar
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="confirmation_number">confirmation_number</span>
+                        Tickets
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                        Settings
+                    </a>
+</li>
+</ul>
+</div>
+<div class="mt-auto pt-6 border-t border-outline-variant/20 px-4">
+<ul>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+                        Help Center
+                    </a>
+</li>
+</ul>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 ml-[260px] flex flex-col min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="fixed top-0 right-0 z-10 flex justify-between items-center h-16 px-8 ml-[260px] w-[calc(100%-260px)] bg-surface dark:bg-surface-dim shadow-sm">
+<div class="flex items-center gap-4">
+<h2 class="font-headline-md text-headline-md text-on-surface">Dashboard</h2>
+<div class="relative input-focus rounded-DEFAULT bg-[#F1F5F9] px-3 py-1.5 flex items-center gap-2 border border-[#CBD5E1] w-64">
+<span class="material-symbols-outlined text-outline text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-full outline-none p-0 text-on-surface placeholder:text-outline" placeholder="Search bookings..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-all p-2 rounded-full cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-all p-2 rounded-full cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" data-icon="chat_bubble">chat_bubble</span>
+</button>
+<button class="text-on-surface-variant hover:bg-surface-container-high transition-all p-2 rounded-full cursor-pointer active:opacity-80 flex items-center justify-center">
+<img alt="Admin Avatar" class="w-8 h-8 rounded-full border border-outline-variant" data-alt="A small circular avatar image of a professional male administrator, used in a top navigation bar. Clean, well-lit, corporate headshot against a neutral background. High-quality photographic style suitable for a modern web application dashboard." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAd9GEBJb8XsGMS93lv-voC9tdthZ4SOQCgbOC7smm7HP3oF-ta91H30IQPiVPiN-3MiX6ZjUOvPTnaKdz41YSdlJIylCe2eYFmfgPVIXgmK-ppci_RBIuzAnAqfi4hyMfE47gYKWwwCvs78qH5NZLN-VIbFFQSog6uh-CbQ_vMJKBeBMw-EOArSz_NaqKtn5lLwEUCESIeiUlRc84d68vEYON_s-JXE4IUH-4P_6bF-Dt2oCOBDqyGPFCmJutKaVh1R1Ux1l4s4aP1"/>
+</button>
+</div>
+</header>
+<!-- Canvas -->
+<main class="flex-1 mt-16 p-section-padding overflow-y-auto">
+<div class="max-w-[1440px] mx-auto">
+<!-- Header Actions -->
+<div class="flex justify-between items-end mb-6">
+<div>
+<h3 class="font-headline-lg text-headline-lg text-on-surface">October 2023</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Manage availability and quick bookings</p>
+</div>
+<div class="flex gap-2">
+<button class="bg-white border border-[#E2E8F0] text-[#1E293B] font-label-md text-label-md px-4 py-2 rounded-DEFAULT flex items-center gap-2 hover:bg-[#F8FAFC]">
+<span class="material-symbols-outlined text-sm">chevron_left</span>
+                            Prev
+                        </button>
+<button class="bg-white border border-[#E2E8F0] text-[#1E293B] font-label-md text-label-md px-4 py-2 rounded-DEFAULT flex items-center gap-2 hover:bg-[#F8FAFC]">
+                            Next
+                            <span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+<button class="bg-[#0F172A] text-white font-label-md text-label-md px-4 py-2 rounded-DEFAULT ml-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">add</span>
+                            Manual Entry
+                        </button>
+</div>
+</div>
+<!-- Calendar Grid (Bento Style) -->
+<div class="surface-level-1 rounded-xl p-6">
+<!-- Day Headers -->
+<div class="grid grid-cols-7 gap-4 mb-4">
+<div class="font-label-sm text-label-sm text-on-surface-variant text-center uppercase tracking-wider">Sun</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant text-center uppercase tracking-wider">Mon</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant text-center uppercase tracking-wider">Tue</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant text-center uppercase tracking-wider">Wed</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant text-center uppercase tracking-wider">Thu</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant text-center uppercase tracking-wider">Fri</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant text-center uppercase tracking-wider">Sat</div>
+</div>
+<!-- Days Grid -->
+<div class="grid grid-cols-7 gap-4 auto-rows-[minmax(120px,auto)]" id="calendar-grid">
+<!-- Empty Cell -->
+<div class="p-2 border border-transparent"></div>
+<!-- Sample Cells (We'll hardcode a few to show state) -->
+<div class="relative p-3 border border-[#E2E8F0] rounded-lg bg-white hover:border-secondary transition-colors cursor-pointer group" onclick="openOverlay('1')">
+<span class="font-label-md text-label-md text-on-surface block mb-2">1</span>
+<div class="space-y-1">
+<div class="px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] rounded flex justify-between items-center">
+<span>Suite A</span>
+<span class="material-symbols-outlined text-[12px]">check_circle</span>
+</div>
+<div class="px-2 py-1 bg-indigo-50 text-indigo-700 text-[10px] rounded flex justify-between items-center">
+<span>Room 102</span>
+<span class="material-symbols-outlined text-[12px]">lock</span>
+</div>
+</div>
+<div class="absolute inset-0 bg-secondary/5 opacity-0 group-hover:opacity-100 rounded-lg pointer-events-none transition-opacity"></div>
+</div>
+<div class="relative p-3 border border-[#E2E8F0] rounded-lg bg-white hover:border-secondary transition-colors cursor-pointer group" onclick="openOverlay('2')">
+<span class="font-label-md text-label-md text-on-surface block mb-2">2</span>
+<div class="space-y-1">
+<div class="px-2 py-1 bg-rose-50 text-rose-700 text-[10px] rounded flex justify-between items-center">
+<span>All Venues</span>
+<span class="material-symbols-outlined text-[12px]">cancel</span>
+</div>
+</div>
+<div class="absolute inset-0 bg-secondary/5 opacity-0 group-hover:opacity-100 rounded-lg pointer-events-none transition-opacity"></div>
+</div>
+<div class="relative p-3 border border-[#E2E8F0] rounded-lg bg-white hover:border-secondary transition-colors cursor-pointer group" onclick="openOverlay('3')">
+<span class="font-label-md text-label-md text-on-surface block mb-2">3</span>
+<div class="space-y-1">
+<div class="px-2 py-1 bg-amber-50 text-amber-700 text-[10px] rounded flex justify-between items-center">
+<span>Terrace (Hold)</span>
+<span class="material-symbols-outlined text-[12px]">schedule</span>
+</div>
+<div class="px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] rounded flex justify-between items-center">
+<span>Suite A</span>
+<span class="material-symbols-outlined text-[12px]">check_circle</span>
+</div>
+</div>
+<div class="absolute inset-0 bg-secondary/5 opacity-0 group-hover:opacity-100 rounded-lg pointer-events-none transition-opacity"></div>
+</div>
+<div class="relative p-3 border border-[#E2E8F0] rounded-lg bg-[#F8FAFC] opacity-75 cursor-not-allowed">
+<span class="font-label-md text-label-md text-on-surface-variant block mb-2">4</span>
+<div class="text-[10px] text-center text-on-surface-variant mt-4">Maintenance</div>
+</div>
+<!-- Generating remaining empty/generic cells for visual structure -->
+<script>
+                            for(let i=5; i<=31; i++) {
+                                document.write(`
+                                <div class="relative p-3 border border-[#E2E8F0] rounded-lg bg-white hover:border-secondary transition-colors cursor-pointer group" onclick="openOverlay('${i}')">
+                                    <span class="font-label-md text-label-md text-on-surface block mb-2">${i}</span>
+                                    <div class="space-y-1">
+                                        <div class="px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] rounded flex justify-between items-center">
+                                            <span>Available</span>
+                                        </div>
+                                    </div>
+                                    <div class="absolute inset-0 bg-secondary/5 opacity-0 group-hover:opacity-100 rounded-lg pointer-events-none transition-opacity"></div>
+                                </div>
+                                `);
+                            }
+                        </script>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- Quick Create Overlay (Hidden by default) -->
+<div class="fixed inset-0 bg-black/20 z-50 hidden flex items-center justify-center backdrop-blur-[2px]" id="quick-create-overlay">
+<div class="surface-level-2 rounded-xl w-[400px] overflow-hidden transform scale-95 opacity-0 transition-all duration-200" id="overlay-content">
+<div class="p-6 border-b border-[#E2E8F0] flex justify-between items-center bg-[#F8FAFC]">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface">Quick Booking</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1" id="overlay-date">Oct 1, 2023</p>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-[#E2E8F0] transition-colors" onclick="closeOverlay()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="p-6 space-y-4">
+<div class="input-focus">
+<label class="block font-label-md text-label-md text-on-surface mb-1">Guest Name</label>
+<input class="w-full border border-[#CBD5E1] rounded px-3 py-2 text-sm outline-none bg-white" type="text"/>
+</div>
+<div class="input-focus">
+<label class="block font-label-md text-label-md text-on-surface mb-1">Select Venue/Room</label>
+<select class="w-full border border-[#CBD5E1] rounded px-3 py-2 text-sm outline-none bg-white appearance-none">
+<option>Suite A (Available)</option>
+<option>Room 102 (Booked)</option>
+<option>Terrace</option>
+</select>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="input-focus">
+<label class="block font-label-md text-label-md text-on-surface mb-1">Check-in</label>
+<input class="w-full border border-[#CBD5E1] rounded px-3 py-2 text-sm outline-none bg-white" type="time"/>
+</div>
+<div class="input-focus">
+<label class="block font-label-md text-label-md text-on-surface mb-1">Check-out</label>
+<input class="w-full border border-[#CBD5E1] rounded px-3 py-2 text-sm outline-none bg-white" type="time"/>
+</div>
+</div>
+<div class="pt-4 flex gap-3 justify-end">
+<button class="bg-white border border-[#E2E8F0] text-[#1E293B] font-label-md text-label-md px-4 py-2 rounded-DEFAULT hover:bg-[#F8FAFC]" onclick="closeOverlay()">
+                        Cancel
+                    </button>
+<button class="bg-[#0F172A] text-white font-label-md text-label-md px-4 py-2 rounded-DEFAULT hover:bg-[#1E293B]">
+                        Create Hold
+                    </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+        function openOverlay(day) {
+            document.getElementById('overlay-date').textContent = 'Oct ' + day + ', 2023';
+            const overlay = document.getElementById('quick-create-overlay');
+            const content = document.getElementById('overlay-content');
+            
+            overlay.classList.remove('hidden');
+            // Small delay to allow display:block to apply before animating opacity/transform
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeOverlay() {
+            const overlay = document.getElementById('quick-create-overlay');
+            const content = document.getElementById('overlay-content');
+            
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 200); // match transition duration
+        }
+    </script>
+</body></html>

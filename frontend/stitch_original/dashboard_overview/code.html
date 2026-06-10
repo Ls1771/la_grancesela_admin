@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>La Grancesela - Dashboard Overview</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-fixed-dim": "#dec29a",
+                      "on-error-container": "#93000a",
+                      "on-tertiary": "#ffffff",
+                      "surface-variant": "#e4e2e4",
+                      "on-error": "#ffffff",
+                      "tertiary": "#000000",
+                      "on-primary": "#ffffff",
+                      "on-secondary-container": "#fffbff",
+                      "primary-container": "#131b2e",
+                      "outline-variant": "#c6c6cd",
+                      "on-tertiary-container": "#98805d",
+                      "on-primary-fixed": "#131b2e",
+                      "secondary": "#4b41e1",
+                      "surface-container-low": "#f6f3f5",
+                      "background": "#fcf8fa",
+                      "inverse-on-surface": "#f3f0f2",
+                      "surface": "#fcf8fa",
+                      "on-surface-variant": "#45464d",
+                      "secondary-container": "#645efb",
+                      "secondary-fixed": "#e2dfff",
+                      "surface-dim": "#dcd9db",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-container": "#271901",
+                      "surface-tint": "#565e74",
+                      "on-background": "#1b1b1d",
+                      "primary": "#000000",
+                      "inverse-surface": "#303032",
+                      "surface-bright": "#fcf8fa",
+                      "on-secondary": "#ffffff",
+                      "on-tertiary-fixed-variant": "#574425",
+                      "on-tertiary-fixed": "#271901",
+                      "on-primary-fixed-variant": "#3f465c",
+                      "error": "#ba1a1a",
+                      "primary-fixed-dim": "#bec6e0",
+                      "primary-fixed": "#dae2fd",
+                      "secondary-fixed-dim": "#c3c0ff",
+                      "on-secondary-fixed": "#0f0069",
+                      "error-container": "#ffdad6",
+                      "on-secondary-fixed-variant": "#3323cc",
+                      "on-primary-container": "#7c839b",
+                      "surface-container": "#f0edef",
+                      "inverse-primary": "#bec6e0",
+                      "outline": "#76777d",
+                      "surface-container-highest": "#e4e2e4",
+                      "on-surface": "#1b1b1d",
+                      "tertiary-fixed": "#fcdeb5",
+                      "surface-container-high": "#eae7e9"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "section-padding": "2rem",
+                      "sidebar-width": "260px",
+                      "gutter": "1.5rem",
+                      "container-max-width": "1440px",
+                      "card-gap": "1rem"
+              },
+              "fontFamily": {
+                      "label-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-sm": ["Inter"],
+                      "headline-lg": ["Inter"],
+                      "headline-md": ["Inter"],
+                      "headline-lg-mobile": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "label-md": ["Inter"]
+              },
+              "fontSize": {
+                      "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}],
+                      "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Shared Style Overrides & Helpers */
+        .shadow-ambient {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] text-on-surface font-body-md min-h-screen flex">
+<!-- SideNavBar -->
+<nav class="fixed left-0 top-0 h-full w-[260px] bg-primary dark:bg-surface-container-lowest border-r border-outline-variant dark:border-outline flex flex-col py-6 z-20">
+<div class="px-6 mb-8">
+<h1 class="font-headline-sm text-headline-sm text-on-primary dark:text-primary tracking-tight mb-1">La Grancesela</h1>
+<p class="font-label-md text-label-md text-on-primary/70">Boutique Management</p>
+</div>
+<div class="px-4 mb-6">
+<button class="w-full bg-secondary text-white font-body-md py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-secondary/90 transition-colors">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">add</span>
+                New Booking
+            </button>
+</div>
+<div class="flex-1 overflow-y-auto space-y-1">
+<!-- Active Tab: Dashboard -->
+<a class="flex items-center gap-3 px-4 py-3 border-l-4 border-secondary bg-secondary-container/10 text-on-primary dark:text-primary font-bold transition-colors duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">dashboard</span>
+                Dashboard
+            </a>
+<!-- Inactive Tabs -->
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">calendar_month</span>
+                Bookings
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">event</span>
+                Events
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">event_note</span>
+                Calendar
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">confirmation_number</span>
+                Tickets
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">settings</span>
+                Settings
+            </a>
+</div>
+<div class="mt-auto pt-4 border-t border-outline-variant/20 dark:border-outline/20 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-primary/70 dark:text-on-surface-variant hover:bg-secondary-container/5 hover:text-on-primary dark:hover:bg-surface-container-high transition-colors duration-200 ease-in-out border-l-4 border-transparent" href="#">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">help</span>
+                Help Center
+            </a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 ml-[260px] min-h-screen flex flex-col w-[calc(100%-260px)]">
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 z-10 bg-surface dark:bg-surface-dim shadow-sm flex justify-between items-center h-16 px-8 ml-[260px] w-[calc(100%-260px)]">
+<div class="flex items-center flex-1">
+<span class="text-secondary font-bold font-label-md text-label-md">Dashboard</span>
+</div>
+<div class="flex-1 flex justify-center">
+<!-- Search bar intentionally left out as per 'search_bar': 'on_left' instruction which is ambiguous, placing it conceptually on left of right-actions -->
+<div class="relative w-full max-w-md hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant/50 text-[18px]">search</span>
+<input class="w-full bg-surface-container-high border border-outline-variant/50 rounded-full py-1.5 pl-10 pr-4 text-body-md focus:border-secondary focus:ring-1 focus:ring-secondary/20 outline-none transition-all" placeholder="Search..." type="text"/>
+</div>
+</div>
+<div class="flex items-center justify-end flex-1 gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-full cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-full cursor-pointer active:opacity-80">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">chat_bubble</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high transition-all rounded-full cursor-pointer active:opacity-80 ml-2">
+<img alt="Admin Avatar" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0_FpzIpBLVOsmChL_gmTedo6mHbBWF15DM7tiYS7a10A0f33ag7HGdvnJ1c24Qf5NRlHLW-B3DjyXUKOV5sjIIC6d664EXfgmDd3e4UquD9EZ11FStFOe8H3Rs4GkpCGIbnztzX739ZXw5mThokz3NYdaCajWJPfjJxS2NF2dDn4Tsv4_RRIHTz9Kni8Xifpizqg0u4vbFcjHZDMainMLuU1Z71lSDSVni_lxEiI5JCcsFgtEMCatZAZc7uPPw5S9Yguuzh9cUWFL"/>
+</button>
+</div>
+</header>
+<!-- Dashboard Canvas -->
+<main class="flex-1 mt-16 p-section-padding max-w-container-max-width mx-auto w-full">
+<div class="mb-8">
+<h2 class="font-headline-md text-headline-md text-on-background mb-2">Welcome back, Admin</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Here is your overview for today.</p>
+</div>
+<!-- Top Section: Summary Cards (Bento Grid) -->
+<section class="bento-grid mb-gutter">
+<!-- Card 1 -->
+<div class="bg-white rounded-xl border border-[#E2E8F0] shadow-ambient p-6 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Total Bookings</p>
+<span class="material-symbols-outlined text-secondary bg-secondary/10 p-2 rounded-lg" style="font-variation-settings: 'FILL' 0;">luggage</span>
+</div>
+<div>
+<h3 class="font-headline-lg text-headline-lg text-on-background">142</h3>
+<p class="font-label-sm text-label-sm text-emerald-600 mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> +12% from last month
+                        </p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-white rounded-xl border border-[#E2E8F0] shadow-ambient p-6 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Active Events</p>
+<span class="material-symbols-outlined text-secondary bg-secondary/10 p-2 rounded-lg" style="font-variation-settings: 'FILL' 0;">celebration</span>
+</div>
+<div>
+<h3 class="font-headline-lg text-headline-lg text-on-background">8</h3>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-2">Scheduled for this week</p>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-white rounded-xl border border-[#E2E8F0] shadow-ambient p-6 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Pending Inquiries</p>
+<span class="material-symbols-outlined text-amber-600 bg-amber-50 p-2 rounded-lg" style="font-variation-settings: 'FILL' 0;">mark_email_unread</span>
+</div>
+<div>
+<h3 class="font-headline-lg text-headline-lg text-on-background">24</h3>
+<p class="font-label-sm text-label-sm text-rose-600 mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">warning</span> 5 require immediate attention
+                        </p>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-white rounded-xl border border-[#E2E8F0] shadow-ambient p-6 flex flex-col justify-between">
+<div class="flex justify-between items-start mb-4">
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Revenue This Month</p>
+<span class="material-symbols-outlined text-emerald-600 bg-emerald-50 p-2 rounded-lg" style="font-variation-settings: 'FILL' 0;">payments</span>
+</div>
+<div>
+<h3 class="font-headline-lg text-headline-lg text-on-background">$45,200</h3>
+<p class="font-label-sm text-label-sm text-emerald-600 mt-2 flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> +8% from last month
+                        </p>
+</div>
+</div>
+</section>
+<!-- Main Section: Two Columns -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column (Wider): Recent Booking Requests -->
+<div class="lg:col-span-8 bg-white rounded-xl border border-[#E2E8F0] shadow-ambient overflow-hidden flex flex-col">
+<div class="px-6 py-5 border-b border-[#E2E8F0] flex justify-between items-center bg-[#F8FAFC]">
+<h3 class="font-headline-sm text-headline-sm text-on-background">Recent Booking Requests</h3>
+<button class="text-secondary font-label-md text-label-md hover:underline flex items-center gap-1">
+                            View All <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto flex-1">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#F1F5F9] border-b border-[#E2E8F0]">
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Guest Name</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Dates</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Room Type</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="py-3 px-4 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody class="font-body-md text-body-md text-on-background divide-y divide-[#E2E8F0]">
+<tr class="hover:bg-[#F8FAFC] transition-colors group">
+<td class="py-3 px-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-sm">ES</div>
+                                        Elena Silva
+                                    </td>
+<td class="py-3 px-4 text-on-surface-variant">Oct 12 - Oct 15</td>
+<td class="py-3 px-4 text-on-surface-variant">Ocean Suite</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                            Pending
+                                        </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="bg-white border border-[#E2E8F0] text-[#1E293B] hover:bg-surface-container-low px-3 py-1.5 rounded-lg text-sm font-medium transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">Review</button>
+</td>
+</tr>
+<tr class="hover:bg-[#F8FAFC] transition-colors group">
+<td class="py-3 px-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-sm">MJ</div>
+                                        Marcus Johnson
+                                    </td>
+<td class="py-3 px-4 text-on-surface-variant">Oct 18 - Oct 22</td>
+<td class="py-3 px-4 text-on-surface-variant">Standard Queen</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                            Confirmed
+                                        </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="bg-white border border-[#E2E8F0] text-[#1E293B] hover:bg-surface-container-low px-3 py-1.5 rounded-lg text-sm font-medium transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">View</button>
+</td>
+</tr>
+<tr class="hover:bg-[#F8FAFC] transition-colors group">
+<td class="py-3 px-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-sm">AL</div>
+                                        Aisha Patel
+                                    </td>
+<td class="py-3 px-4 text-on-surface-variant">Nov 02 - Nov 05</td>
+<td class="py-3 px-4 text-on-surface-variant">Garden Villa</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                                            Pending
+                                        </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="bg-white border border-[#E2E8F0] text-[#1E293B] hover:bg-surface-container-low px-3 py-1.5 rounded-lg text-sm font-medium transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">Review</button>
+</td>
+</tr>
+<tr class="hover:bg-[#F8FAFC] transition-colors group">
+<td class="py-3 px-4 flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-bold text-sm">TR</div>
+                                        Thomas Rossi
+                                    </td>
+<td class="py-3 px-4 text-on-surface-variant">Nov 10 - Nov 12</td>
+<td class="py-3 px-4 text-on-surface-variant">Ocean Suite</td>
+<td class="py-3 px-4">
+<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-rose-100 text-rose-800">
+                                            Cancelled
+                                        </span>
+</td>
+<td class="py-3 px-4 text-right">
+<button class="bg-white border border-[#E2E8F0] text-[#1E293B] hover:bg-surface-container-low px-3 py-1.5 rounded-lg text-sm font-medium transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100">View</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Right Column (Narrower): Admin Notes -->
+<div class="lg:col-span-4 bg-white rounded-xl border border-[#E2E8F0] shadow-ambient p-6 flex flex-col h-full">
+<div class="flex items-center gap-2 mb-6">
+<span class="material-symbols-outlined text-on-surface-variant">edit_note</span>
+<h3 class="font-headline-sm text-headline-sm text-on-background">Admin Notes</h3>
+</div>
+<div class="flex-1 flex flex-col space-y-4 mb-4 overflow-y-auto max-h-[300px] pr-2">
+<!-- Existing Note -->
+<div class="bg-[#F8FAFC] rounded-lg p-3 border border-[#E2E8F0]">
+<div class="flex justify-between items-start mb-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Sarah (Manager)</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant/70">10:45 AM</span>
+</div>
+<p class="font-body-md text-body-md text-on-background text-sm">Check catering arrangements for the Johnson wedding this weekend. Need to confirm vegan options.</p>
+</div>
+<!-- Existing Note -->
+<div class="bg-[#F8FAFC] rounded-lg p-3 border border-[#E2E8F0]">
+<div class="flex justify-between items-start mb-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Admin</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant/70">Yesterday</span>
+</div>
+<p class="font-body-md text-body-md text-on-background text-sm">Pool maintenance scheduled for Tuesday morning. Notify guests in North Wing.</p>
+</div>
+</div>
+<div class="mt-auto">
+<label class="sr-only" for="admin-note">New Note</label>
+<textarea class="w-full border border-[#CBD5E1] rounded-lg p-3 font-body-md text-body-md text-on-background placeholder-on-surface-variant/50 focus:border-secondary focus:ring-1 focus:ring-secondary/20 outline-none transition-all resize-none mb-3" id="admin-note" placeholder="Type a quick note here..." rows="3"></textarea>
+<button class="w-full bg-[#0F172A] text-white font-body-md py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 hover:bg-[#0F172A]/90 transition-colors">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 0;">send</span>
+                            Add Note
+                        </button>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>
