@@ -21,5 +21,4 @@
 Email: admin@lagrancesela.com
 Password: ChangeThisPassword123!
 
-## Important
-Do not commit or send the real `.env` file. Use `.env.example` for handoff.
+
