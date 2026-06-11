@@ -35,7 +35,7 @@
         ticket_description: ticket_description.value
       };
       try {
-        const response = await fetch("http://localhost:3000/api/public/tickets", {
+        const response = await fetch("http://la-grancesela-api.onrender.com/api/public/tickets", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(ticketData)
